@@ -1,0 +1,57 @@
+services:
+  postgres:
+    image: postgres
+    container_name: kutanga_postgres
+    restart: always
+    ports:
+    - "5432:5432"
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+  
+  auth_service:
+    build: ./backend/auth_service
+    container_name: kutanga_auth_service
+    restart: always
+    ports:
+    - "8000:8000"
+    depends_on:
+    - postgres
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    volumes:
+    - ./backend/common:/app/common
+    - ./backend/auth_service:/app
+  
+  game_server_service:
+    build: ./backend/game_server_service
+    container_name: kutanga_game_server_service
+    restart: always
+    ports:
+    - "8001:8001"
+    depends_on:
+    - postgres
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    volumes:
+    - ./backend/common:/app/common
+    - ./backend/game_server_service:/app
+
+  monitoring_service:
+    build: ./backend/monitoring_service
+    container_name: kutanga_monitoring_service
+    restart: always
+    ports:
+    - "8002:8002"
+    depends_on:
+    - postgres
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+
+    
+volumes:
+  postgres-data: 
+    driver: local

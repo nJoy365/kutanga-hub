@@ -21,4 +21,4 @@ def health_check(db: Session = Depends(get_db)):
 
 @app.get("/")
 def root():
-    return {"message": "Auth Service is running! Kutanga"}
+    return {"message": "Game Server Service is running!"}
